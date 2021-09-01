@@ -29,6 +29,7 @@ import {
   Node,
 } from 'slate';
 import imageExtensions from 'image-extensions';
+
 const HOTKEYS = {
   'mod+b': 'bold',
   'mod+i': 'italic',
@@ -190,7 +191,8 @@ const IndexPage = () => {
       <Editable
         renderLeaf={renderLeaf}
         // renderElement={(props) => <Element {...props} />}
-        renderElement={({ attributes, element, children }) => {
+        renderElement={(props) => {
+          const { attributes, children, element } = props;
           if (element.type === 'youtube' && element.videoId != null) {
             return (
               <div {...attributes} contentEditable={false}>
@@ -204,7 +206,7 @@ const IndexPage = () => {
             );
           } else {
             return (
-              <Element {...attributes} {...props}>
+              <Element {...props} {...attributes} element={element}>
                 {children}
               </Element>
             );
@@ -214,7 +216,6 @@ const IndexPage = () => {
         spellCheck
         autoFocus
         onKeyDown={(event) => {
-          onKeyDown;
           for (const hotkey in HOTKEYS) {
             if (isHotkey(hotkey, event)) {
               event.preventDefault();
@@ -222,6 +223,7 @@ const IndexPage = () => {
               toggleMark(editor, mark);
             }
           }
+          onKeyDown;
         }}
         onPaste={(event) => {
           const pastedText = event.clipboardData?.getData('text')?.trim();
@@ -408,7 +410,7 @@ const Element = ({ props, attributes, children, element }) => {
         </a>
       );
     case 'image':
-      return <Image {...props} element={element} />;
+      return <img {...props} element={element} />;
     case 'mention':
       return <Mention {...props} />;
     default:
@@ -811,6 +813,7 @@ const initialValue = [
     children: [
       {
         text: '',
+        marks: [],
       },
     ],
   },
